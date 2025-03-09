@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة تقارير الصيانة - مصنع INSUTECH</title>
+    <style>
+        :root {
+            --primary-color: #e53935;
+            --secondary-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #dddddd;
+            --hover-color: #f5f5f5;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            padding-top: 80px;
+            padding-bottom: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--secondary-color);
+            box-shadow: 0 2px 10px var(--shadow-color);
+            z-index: 1000;
+            border-radius: 0 0 20px 20px;
+            padding: 10px 20px;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+        
+        .logo-circle {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover, .nav-btn.active {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+        
+        /* Main Content Styles */
+        .content {
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        /* Form Styles */
+        .form-container {
+            display: none;
+        }
+        
+        .form-container.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-control {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #c62828;
+        }
+        
+        /* Table Styles */
+        .reports-container {
+            display: none;
+            overflow-x: auto;
+        }
+        
+        .reports-container.active {
+            display: block;
+        }
+        
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .status-working {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .status-stopped {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        
+        .share-controls {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 18px;
+            }
+            
+            .nav-btn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .form-control {
+                min-width: 100%;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        .detail-item {
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            padding: 8px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+        }
+        
+        /* Utility Classes */
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-10 {
+            margin-top: 10px;
+        }
+        
+        .mt-20 {
+            margin-top: 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <div class="logo-circle">IN</div>
+                <h1>نظام تقارير الصيانة - INSUTECH</h1>
+            </div>
+            <div class="nav-links">
+                <button id="addReportBtn" class="nav-btn active">إضافة تقرير</button>
+                <button id="viewReportsBtn" class="nav-btn">عرض التقارير</button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Add Report Form -->
+        <div id="addReportForm" class="content form-container active">
+            <h2 class="section-title">إضافة تقرير صيانة جديد</h2>
+            <form id="maintenanceForm">
+                <div class="form-row">
+                    <div class="form-control">
+                        <label for="reportDate">تاريخ التقرير</label>
+                        <input type="date" id="reportDate" required>
+                    </div>
+                    <div class="form-control">
+                        <label for="productionLine">خط الإنتاج</label>
+                        <select id="productionLine" required>
+                            <option value="">اختر خط الإنتاج</option>
+                            <option value="Line 1">Line 1</option>
+                            <option value="Line 2">Line 2</option>
+                            <option value="Line 3">Line 3</option>
+                            <option value="XP">XP</option>
+                            <option value="الخط البارد">الخط البارد</option>
+                            <option value="منطقة الكسارة">منطقة الكسارة</option>
+                            <option value="منطقة الخلاطات">منطقة الخلاطات</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-control">
+                        <label for="lineStatus">حالة الخط</label>
+                        <select id="lineStatus" required>
+                            <option value="">اختر الحالة</option>
+                            <option value="working">يعمل</option>
+                            <option value="stopped">متوقف</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label for="maintenanceTime">وقت الصيانة (بالدقائق)</label>
+                        <input type="number" id="maintenanceTime" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="issueDescription">وصف العطل / الصيانة</label>
+                    <textarea id="issueDescription" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="materialsUsed">المواد المستخدمة</label>
+                    <textarea id="materialsUsed"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="technician">اسم الفني</label>
+                    <input type="text" id="technician" required>
+                </div>
+                
+                <div class="text-center mt-20">
+                    <button type="submit" class="btn">حفظ التقرير</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- View Reports -->
+        <div id="viewReports" class="content reports-container">
+            <h2 class="section-title">عرض تقارير الصيانة</h2>
+            
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="dateFilter">تصفية حسب الفترة</label>
+                    <select id="dateFilter">
+                        <option value="all">جميع التقارير</option>
+                        <option value="today">اليوم</option>
+                        <option value="week">هذا الأسبوع</option>
+                        <option value="month">هذا الشهر</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="lineFilter">تصفية حسب الخط</label>
+                    <select id="lineFilter">
+                        <option value="all">جميع الخطوط</option>
+                        <option value="Line 1">Line 1</option>
+                        <option value="Line 2">Line 2</option>
+                        <option value="Line 3">Line 3</option>
+                        <option value="XP">XP</option>
+                        <option value="الخط البارد">الخط البارد</option>
+                       <option value="منطقة الكسارة">منطقة الكسارة</option>
+                       <option value="منطقة الخلاطات">منطقة الخلاطات</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="statusFilter">تصفية حسب الحالة</label>
+                    <select id="statusFilter">
+                        <option value="all">جميع الحالات</option>
+                        <option value="working">يعمل</option>
+                        <option value="stopped">متوقف</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Reports Table -->
+            <div class="table-responsive">
+                <table id="reportsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>التاريخ</th>
+                            <th>خط الإنتاج</th>
+                            <th>الحالة</th>
+                            <th>وقت الصيانة</th>
+                            <th>الفني</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
+                        <!-- Table contents will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Share Controls -->
+            <div class="share-controls">
+                <button id="shareWhatsAppBtn" class="btn">مشاركة التقارير عبر واتساب</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Details Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">تفاصيل التقرير</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-item">
+                    <div class="detail-label">التاريخ</div>
+                    <div id="modalDate" class="detail-value"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">خط الإنتاج</div>
+                    <div id="modalLine" class="detail-value"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">الحالة</div>
+                    <div id="modalStatus" class="detail-value"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">وقت الصيانة</div>
+                    <div id="modalTime" class="detail-value"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">وصف العطل / الصيانة</div>
+                    <div id="modalDescription" class="detail-value"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">المواد المستخدمة</div>
+                    <div id="modalMaterials" class="detail-value"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">اسم الفني</div>
+                    <div id="modalTechnician" class="detail-value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const addReportBtn = document.getElementById('addReportBtn');
+        const viewReportsBtn = document.getElementById('viewReportsBtn');
+        const addReportForm = document.getElementById('addReportForm');
+        const viewReports = document.getElementById('viewReports');
+        const maintenanceForm = document.getElementById('maintenanceForm');
+        const reportsTableBody = document.getElementById('reportsTableBody');
+        const reportModal = document.getElementById('reportModal');
+        const closeModalBtn = document.querySelector('.close-btn');
+        const dateFilter = document.getElementById('dateFilter');
+        const lineFilter = document.getElementById('lineFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
+        
+        // Set today's date as default
+        document.getElementById('reportDate').valueAsDate = new Date();
+        
+        // Navigation
+        addReportBtn.addEventListener('click', () => {
+            addReportBtn.classList.add('active');
+            viewReportsBtn.classList.remove('active');
+            addReportForm.classList.add('active');
+            viewReports.classList.remove('active');
+        });
+        
+        viewReportsBtn.addEventListener('click', () => {
+            viewReportsBtn.classList.add('active');
+            addReportBtn.classList.remove('active');
+            viewReports.classList.add('active');
+            addReportForm.classList.remove('active');
+            displayReports();
+        });
+        
+        // Form Submission
+        maintenanceForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const reportDate = document.getElementById('reportDate').value;
+            const productionLine = document.getElementById('productionLine').value;
+            const lineStatus = document.getElementById('lineStatus').value;
+            const maintenanceTime = document.getElementById('maintenanceTime').value;
+            const issueDescription = document.getElementById('issueDescription').value;
+            const materialsUsed = document.getElementById('materialsUsed').value;
+            const technician = document.getElementById('technician').value;
+            
+            // Create report object
+            const report = {
+                id: Date.now(), // Unique ID based on timestamp
+                date: reportDate,
+                line: productionLine,
+                status: lineStatus,
+                time: maintenanceTime,
+                description: issueDescription,
+                materials: materialsUsed,
+                technician: technician,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Get existing reports from localStorage
+            let reports = JSON.parse(localStorage.getItem('maintenanceReports')) || [];
+            
+            // Add the new report
+            reports.push(report);
+            
+            // Save to localStorage
+            localStorage.setItem('maintenanceReports', JSON.stringify(reports));
+            
+            // Reset form
+            maintenanceForm.reset();
+            document.getElementById('reportDate').valueAsDate = new Date();
+            
+            // Show success message
+            alert('تم حفظ التقرير بنجاح!');
+        });
+        
+        // Display Reports
+        function displayReports() {
+            // Get reports from localStorage
+            let reports = JSON.parse(localStorage.getItem('maintenanceReports')) || [];
+            
+            // Apply filters
+            reports = filterReports(reports);
+            
+            // Sort by date (newest first)
+            reports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            // Clear the table
+            reportsTableBody.innerHTML = '';
+            
+            // Check if reports exist
+            if (reports.length === 0) {
+                reportsTableBody.innerHTML = '<tr><td colspan="7" class="text-center">لا توجد تقارير متاحة</td></tr>';
+                return;
+            }
+            
+            // Populate the table
+            reports.forEach((report, index) => {
+                const row = document.createElement('tr');
+                
+                // Format date
+                const dateObj = new Date(report.date);
+                const formattedDate = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
+                
+                // Create status badge
+                const statusText = report.status === 'working' ? 'يعمل' : 'متوقف';
+                const statusClass = report.status === 'working' ? 'status-working' : 'status-stopped';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${formattedDate}</td>
+                    <td>${report.line}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${report.time} دقيقة</td>
+                    <td>${report.technician}</td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" data-id="${report.id}">👁️</button>
+                        <button class="action-btn delete-btn" data-id="${report.id}">🗑️</button>
+                    </td>
+                `;
+                
+                reportsTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const reportId = this.getAttribute('data-id');
+                    viewReportDetails(reportId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const reportId = this.getAttribute('data-id');
+                    deleteReport(reportId);
+                });
+            });
+        }
+        
+        // Filter Reports
+        function filterReports(reports) {
+            const dateValue = dateFilter.value;
+            const lineValue = lineFilter.value;
+            const statusValue = statusFilter.value;
+            
+            return reports.filter(report => {
+                // Date filter
+                let passDateFilter = true;
+                const reportDate = new Date(report.date);
+                const today = new Date();
+                
+                if (dateValue === 'today') {
+                    passDateFilter = reportDate.toDateString() === today.toDateString();
+                } else if (dateValue === 'week') {
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay());
+                    passDateFilter = reportDate >= weekStart;
+                } else if (dateValue === 'month') {
+                    passDateFilter = reportDate.getMonth() === today.getMonth() && 
+                                    reportDate.getFullYear() === today.getFullYear();
+                }
+                
+                // Line filter
+                const passLineFilter = lineValue === 'all' || report.line === lineValue;
+                
+                // Status filter
+                const passStatusFilter = statusValue === 'all' || report.status === statusValue;
+                
+                return passDateFilter && passLineFilter && passStatusFilter;
+            });
+        }
+        
+        // View Report Details
+        function viewReportDetails(reportId) {
+            const reports = JSON.parse(localStorage.getItem('maintenanceReports')) || [];
+            const report = reports.find(r => r.id == reportId);
+            
+            if (report) {
+                // Format date
+                const dateObj = new Date(report.date);
+                const formattedDate = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
+                
+                // Set modal content
+                document.getElementById('modalDate').textContent = formattedDate;
+                document.getElementById('modalLine').textContent = report.line;
+                document.getElementById('modalStatus').textContent = report.status === 'working' ? 'يعمل' : 'متوقف';
+                document.getElementById('modalTime').textContent = `${report.time} دقيقة`;
+                document.getElementById('modalDescription').textContent = report.description;
+                document.getElementById('modalMaterials').textContent = report.materials || 'لا توجد مواد مستخدمة';
+                document.getElementById('modalTechnician').textContent = report.technician;
+                
+                // Show modal
+                reportModal.classList.add('active');
+            }
+        }
+        
+        // Delete Report
+        function deleteReport(reportId) {
+            if (confirm('هل أنت متأكد من رغبتك في حذف هذا التقرير؟')) {
+                let reports = JSON.parse(localStorage.getItem('maintenanceReports')) || [];
+                reports = reports.filter(report => report.id != reportId);
+                localStorage.setItem('maintenanceReports', JSON.stringify(reports));
+                displayReports();
+            }
+        }
+        
+        // Close Modal
+        closeModalBtn.addEventListener('click', () => {
+            reportModal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === reportModal) {
+                reportModal.classList.remove('active');
+            }
+        });
+        
+        // Filter change events
+        dateFilter.addEventListener('change', displayReports);
+        lineFilter.addEventListener('change', displayReports);
+        statusFilter.addEventListener('change', displayReports);
+        
+        // Share on WhatsApp
+        shareWhatsAppBtn.addEventListener('click', function() {
+            // Get filtered reports
+            let reports = JSON.parse(localStorage.getItem('maintenanceReports')) || [];
+            reports = filterReports(reports);
+            
+            if (reports.length === 0) {
+                alert('لا توجد تقارير للمشاركة!');
+                return;
+            }
+            
+            // Sort by date (newest first)
+            reports.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Create text message
+            let message = "📋 *تقارير الصيانة - مصنع INSUTECH*\n\n";
+            
+            // Add filter information
+            const dateFilterText = dateFilter.options[dateFilter.selectedIndex].text;
+            const lineFilterText = lineFilter.options[lineFilter.selectedIndex].text;
+            message += `🔍 *التصفية:* ${dateFilterText} | ${lineFilterText}\n\n`;
+            
+            // Add reports
+            reports.forEach((report, index) => {
+                const dateObj = new Date(report.date);
+                const formattedDate = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
+                const statusText = report.status === 'working' ? 'يعمل' : 'متوقف';
+                
+                message += `*تقرير ${index + 1}:*\n`;
+                message += `📅 *التاريخ:* ${formattedDate}\n`;
+                message += `🔄 *خط الإنتاج:* ${report.line}\n`;
+                message += `⚙️ *الحالة:* ${statusText}\n`;
+                message += `⏱️ *وقت الصيانة:* ${report.time} دقيقة\n`;
+                message += `👨‍🔧 *الفني:* ${report.technician}\n`;
+                message += `🔍 *الوصف:* ${report.description}\n`;
+                
+                if (report.materials) {
+                    message += `🧰 *المواد المستخدمة:* ${report.materials}\n`;
+                }
+                
+                message += `\n`;
+            });
+            
+            // Add timestamp
+            const now = new Date();
+            message += `🕒 *تم إنشاء التقرير:* ${now.toLocaleString('ar-EG')}\n`;
+            
+            // Encode message for WhatsApp
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+        });
+        
+        // Add filter change events
+        dateFilter.addEventListener('change', displayReports);
+        lineFilter.addEventListener('change', displayReports);
+        statusFilter.addEventListener('change', displayReports);
+    </script>
+</body>
+</html>
